@@ -1,4 +1,7 @@
 
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+
 namespace RazorWeb
 {
  public class Program
