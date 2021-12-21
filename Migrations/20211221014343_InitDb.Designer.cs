@@ -12,8 +12,8 @@ using RazorWeb.Models;
 namespace RazorWeb.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211220143308_initDb")]
-    partial class initDb
+    [Migration("20211221014343_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
