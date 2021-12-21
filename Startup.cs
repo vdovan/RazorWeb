@@ -9,11 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RazorWeb.Constants;
 using RazorWeb.Models;
 namespace RazorWeb
 {
     public class Startup
     {
+        private Dictionary<string, string> strConnList = new Dictionary<string, string>();
+        private static CommonHelper.StringHelper strHp = CommonHelper.StringHelper.CreateInstance();
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -24,13 +27,23 @@ namespace RazorWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddRazorPages();
             services.AddDbContext<AppDbContext>(options =>
             {
-                string strConn = Configuration.GetConnectionString("AppDbContext");
-                Console.WriteLine(strConn);
-                options.UseSqlServer(strConn);
+                string connectionString = Configuration.GetConnectionString("AppDbContext");
+                string conStr = string.Empty;
+
+                if (!strConnList.ContainsKey(connectionString))
+                {
+                    conStr = strHp.MyDecrypt(connectionString, SystemConstants.LegalKey);
+                    strConnList.Add(connectionString, conStr);
+                }
+                else
+                {
+                    conStr = strConnList[connectionString];
+                }
+
+                options.UseSqlServer(conStr);
             });
         }
 
