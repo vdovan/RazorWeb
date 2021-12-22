@@ -11,12 +11,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RazorWeb.Constants;
 using RazorWeb.Models;
+using CommonHelper;
+using Microsoft.AspNetCore.Identity;
+using RazorWeb.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
+
 namespace RazorWeb
 {
     public class Startup
     {
         private Dictionary<string, string> strConnList = new Dictionary<string, string>();
-        private static CommonHelper.StringHelper strHp = CommonHelper.StringHelper.CreateInstance();
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,6 +33,11 @@ namespace RazorWeb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddOptions();
+            var mailconfig = Configuration.GetSection("Mailsetting");
+            services.Configure<MailConfig>(mailconfig);
+            services.AddSingleton<IEmailSender, SendMailService>();
+
             services.AddDbContext<AppDbContext>(options =>
             {
                 string connectionString = Configuration.GetConnectionString("AppDbContext");
@@ -35,7 +45,7 @@ namespace RazorWeb
 
                 if (!strConnList.ContainsKey(connectionString))
                 {
-                    conStr = strHp.MyDecrypt(connectionString, SystemConstants.LegalKey);
+                    conStr = connectionString.MyDecrypt(SystemConstants.LegalKey);
                     strConnList.Add(connectionString, conStr);
                 }
                 else
@@ -44,6 +54,39 @@ namespace RazorWeb
                 }
 
                 options.UseSqlServer(conStr);
+            });
+
+            services.AddIdentity<AppUser, IdentityRole>()
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+
+            //  services.AddDefaultIdentity<AppUser>()
+            // .AddEntityFrameworkStores<AppDbContext>();
+            // .AddDefaultTokenProviders();
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password configurations
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequiredUniqueChars = 1;
+
+                //User lockout configurations
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); // lock in 5 minutes
+                options.Lockout.MaxFailedAccessAttempts = 5; // Locking if wrong access 5 times
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User configurations.
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = true;
+
+                // Login configurations
+                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+
             });
         }
 
@@ -66,6 +109,7 @@ namespace RazorWeb
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
