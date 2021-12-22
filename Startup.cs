@@ -34,7 +34,7 @@ namespace RazorWeb
         {
             services.AddRazorPages();
             services.AddOptions();
-            var mailconfig = Configuration.GetSection("Mailsetting");
+            var mailconfig = Configuration.GetSection("MailSettings");
             services.Configure<MailConfig>(mailconfig);
             services.AddSingleton<IEmailSender, SendMailService>();
 
@@ -86,7 +86,14 @@ namespace RazorWeb
                 // Login configurations
                 options.SignIn.RequireConfirmedEmail = true;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
+                options.SignIn.RequireConfirmedAccount = true;
 
+            });
+
+            services.ConfigureApplicationCookie(options => {
+                options.LoginPath = "/Identity/Account/login";
+                options.LogoutPath = "/Identity/account/logout";
+                options.AccessDeniedPath = "/Identity/Account/Accessdenied";
             });
         }
 
