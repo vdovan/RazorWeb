@@ -1,0 +1,35 @@
+@page
+@model RazorWeb.Admin.Role.IndexModel
+
+<div class="mt-8 mb-16"><h1>Role management</h1></div>
+<hr />
+<div class="mb-4">
+    <a class="btn btn-success btn-small" asp-area="Admin" asp-page="./Create">Create New Role</a>
+</div>
+<div class="mt-4">
+    <Partial name ="_StatusMessage" model = "@Model.StatusMessage"/>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Role Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.roles != null)
+        {
+            foreach (var role in Model.roles)
+            {
+                <tr>
+                    <td>@role.Name</td>
+                    <td>
+                        <a class="btn btn-primary btn-small" asp-area="Admin" asp-page="./Edit" asp-route-id ="@role.Id">Edit</a>
+                        <a class="btn btn-danger btn-small" asp-area="Admin" asp-page="./Delete" asp-route-id = "@role.Id">Delete</a>
+
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

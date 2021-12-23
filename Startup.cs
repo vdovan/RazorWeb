@@ -15,6 +15,9 @@ using CommonHelper;
 using Microsoft.AspNetCore.Identity;
 using RazorWeb.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using RazorWeb.Security;
+using Microsoft.AspNetCore.Authorization;
+using RazorWeb.MiddleWare;
 
 namespace RazorWeb
 {
@@ -37,7 +40,7 @@ namespace RazorWeb
             var mailconfig = Configuration.GetSection("MailSettings");
             services.Configure<MailConfig>(mailconfig);
             services.AddSingleton<IEmailSender, SendMailService>();
-
+            services.AddSingleton<IdentityErrorDescriber, AppIdentityErrorDescriber>();
             services.AddDbContext<AppDbContext>(options =>
             {
                 string connectionString = Configuration.GetConnectionString("AppDbContext");
@@ -95,6 +98,15 @@ namespace RazorWeb
                 options.LogoutPath = "/Identity/account/logout";
                 options.AccessDeniedPath = "/Identity/Account/Accessdenied";
             });
+
+            services.AddAuthorization(options => {
+                options.AddPolicy("App", policyBuilder => {
+                    policyBuilder.RequireAuthenticatedUser();
+                    policyBuilder.Requirements.Add(new AppRequirement());
+                });
+            });
+
+            services.AddTransient<IAuthorizationHandler, AppAuthorizationHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,6 +122,7 @@ namespace RazorWeb
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            //app.UseMiddleware<LoggingMiddleWare>();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

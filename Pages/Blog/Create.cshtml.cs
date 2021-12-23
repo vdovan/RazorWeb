@@ -3,13 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using RazorWeb.MiddleWare;
 using RazorWeb.Models;
 
 namespace RazorWeb.Pages_Blog
 {
+    [Authorize(Policy = "App")]
+    [LoggingMiddleWare]
     public class CreateModel : PageModel
     {
         private readonly RazorWeb.Models.AppDbContext _context;

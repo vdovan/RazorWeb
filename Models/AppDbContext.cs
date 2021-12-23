@@ -5,10 +5,12 @@ namespace RazorWeb.Models
 {
     public class AppDbContext : IdentityDbContext<AppUser>
     {
+        
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsbuilder)
         {
             base.OnConfiguring(optionsbuilder);
