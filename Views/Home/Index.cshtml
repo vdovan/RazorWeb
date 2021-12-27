@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    var path = ViewBag.url;
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    @if(path != null)
+    {
+            <h2>@ViewBag.url</h2>
+    }
+
+    <a asp-area="Identity" asp-controller = "Account" asp-action = "Login">Login</a>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
