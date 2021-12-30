@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AppMvc.Areas.Identity.Models.RoleViewModels;
+using AppMvc.Common;
 using AppMvc.ExtensionMethods;
 using AppMvc.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,7 @@ namespace AppMvc.Areas.Identity.Controllers
 {
 
     //[Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "App")]
     [Area("Identity")]
     [Route("/Role/[action]")]
     public class RoleController : Controller
@@ -45,7 +47,6 @@ namespace AppMvc.Areas.Identity.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            
            var r = await _roleManager.Roles.OrderBy(r => r.Name).ToListAsync();
            var roles = new List<RoleModel>();
            foreach (var _r in r)
@@ -65,6 +66,55 @@ namespace AppMvc.Areas.Identity.Controllers
             return View(roles);
         } 
 
+         [HttpGet]
+        public async Task<IActionResult> getRoles()
+        {
+           var r = await _roleManager.Roles.OrderBy(r => r.Name).ToListAsync();
+           var roles = new List<RoleModel>();
+           foreach (var _r in r)
+           {
+               var claims = await _roleManager.GetClaimsAsync(_r);
+               var claimsString = claims.Select(c => c.Type  + "=" + c.Value);
+
+               var rm = new RoleModel()
+               {
+                   Name = _r.Name,
+                   Id = _r.Id,
+                   Claims = claimsString.ToArray()
+               };
+               roles.Add(rm);
+           }
+           ApiResponseVm res = new ApiResponseVm();
+           res.Ret = ResultType.OK;
+           res.Msg = roles;
+            return Json(res);
+        } 
+
+        [HttpGet]
+        public async Task<IActionResult> getRole(string id)
+        {
+           var r = await _roleManager.Roles.Where(r => r.Id == id).FirstOrDefaultAsync();
+           ApiResponseVm res = new ApiResponseVm();
+           if(r != null)
+           {
+                var role = new RoleModel();
+                var claims = await _roleManager.GetClaimsAsync(r);
+                var claimstring = claims.Select(c => c.Type + "=" + c.Value);
+                res.Ret = ResultType.OK;
+                res.Msg = new RoleModel()
+                {
+                    Name = r.Name,
+                    Id = r.Id,
+                    Claims = claimstring.ToArray()
+                };
+           }
+           else
+           {
+               res.UserMsg = "NotFound";
+               
+           }
+            return Json(res);
+        } 
         // GET: /Role/Create
         [HttpGet]
         public IActionResult Create()
@@ -76,6 +126,41 @@ namespace AppMvc.Areas.Identity.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAsync(CreateRoleModel model)
+        {
+            ApiResponseVm res = new ApiResponseVm();
+            if  (!ModelState.IsValid)
+            {
+                res.UserMsg = "Model is not valid";
+                res.Msg = Newtonsoft.Json.JsonConvert.SerializeObject(model);
+                return Json(res);
+            }
+
+            var newRole = new IdentityRole(model.Name);
+            var result = await _roleManager.CreateAsync(newRole);
+            if (result.Succeeded)
+            {
+                // StatusMessage = $"Bạn vừa tạo role mới: {model.Name}";
+                // return RedirectToAction(nameof(Index));
+                res.Ret = ResultType.OK;
+                res.UserMsg =  $"Bạn vừa tạo role mới: {model.Name}";
+                res.Msg = new {
+                    Id = newRole.Id,
+                    Name =newRole.Name
+                };
+            }
+            else
+            {
+                ModelState.AddModelError(result);
+                res.UserMsg = result.ToString();
+            }
+            return Json(res);
+        }
+
+
+        //POST: /Role/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAsync2(CreateRoleModel model)
         {
             if  (!ModelState.IsValid)
             {

@@ -108,6 +108,10 @@ namespace AppMvc
             });
 
             services.AddTransient<IAuthorizationHandler, AppAuthorizationHandler>();
+
+            services.AddAntiforgery(options => {
+                options.HeaderName = "__RequestVerificationToken";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

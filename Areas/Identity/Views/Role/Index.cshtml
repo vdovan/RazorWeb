@@ -1,36 +1,103 @@
 @model List<RoleModel>
 @{
-    ViewData["Title"] = "Danh sách các role (vai trò)";
+
+    ViewData["Title"] = "Quản lí các role (vai trò)";
 }
-<h2>@ViewData["Title"]</h2>
+<h2 class="mt-4">@ViewData["Title"]</h2>
 
 <partial name="_StatusMessage"></partial>
 
+<h2 id="StatusMessage" class="text-center text-danger text-success"></h2>
+@Html.AntiForgeryToken()
+<div class="container-fluid">
+    <div class="row ">
+        <div class="col-md-5 split-container">
+            <div class="search-container split-container">
+                <div class="col-md-6 form-center">
+                    <form>
+                        <div>
+                            <input type="text" class="form-control" placeholder="Role Name"
+                                style="display: inline-block;width: auto;">
+                            <a class="btn btn-primary" id="searchbtn" style="display: inline-block;">Search</a>
+                        </div>
+                    </form>
+                </div>
 
-<div class="mb-2">
-    <a class="btn btn-secondary" asp-action="Create">Tạo role mới</a>
-    <a class="btn btn-secondary" asp-action="Index" asp-controller="User">Quản lý thành viên</a>
+            </div>
+            <div class="split-container">
+                <table class="table">
+                    <thead>
+
+                        <tr>
+                            <th>Tên Role (vai trò)</th>
+                            <th>Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableRole">
+
+                        @foreach (var role in Model)
+
+                        {
+                            <tr>
+                                <td>
+                                    @role.Name
+                                    @foreach (var claim in @role.Claims)
+
+                                    {
+                                        <small>@claim</small><br>
+
+                                    }
+                                </td>
+                                <td>
+                                    <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-roleid="@role.Id">Xóa</a>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-7 ms-auto split-container">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"
+                        type="button" role="tab" aria-controls="home" aria-selected="true">Basic</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+                        type="button" role="tab" aria-controls="profile" aria-selected="false">Permission</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact"
+                        type="button" role="tab" aria-controls="contact" aria-selected="false">Help</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <partial name="_StatusMessage"></partial>
+
+                    <div class="row">
+                        <div class="col-md-6 form-center">
+                            <form method="post" action="Create">
+                                <div class="form-group">
+                                    <label class="control-label">Role Name</label>
+                                    <input name="Name" id="txtroleName" class="form-control" />
+                                </div>
+
+                                <div class="form-group mt-4">
+                                    <input value="Lưu" class="btn btn-primary" onclick="SaveData()" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+                <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="~/js/app/role.js">
 
-<table class="table">
-    <tr>
-        <th>Tên Role (vai trò)</th>
-        <th>Tác vụ</th>
-    </tr>
-    @foreach (var role in Model)
-    {
-        <tr>
-            <td>
-                <p>@role.Name</p>
-                @foreach (var claim in @role.Claims)
-                {
-                    <small>@claim</small><br>
-                }
-            </td>
-            <td>
-                <a class="btn btn-success btn-sm" asp-action="Edit" asp-route-roleid="@role.Id">Cập nhật</a>
-                <a class="btn btn-success btn-sm" asp-action="Delete" asp-route-roleid="@role.Id">Xóa</a>
-            </td>
-        </tr>
-    }
-</table>
+</script>

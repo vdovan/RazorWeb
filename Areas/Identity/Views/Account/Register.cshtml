@@ -6,7 +6,7 @@
 }
 
 
-<div class="row form-login">
+<div class="container-small">
     <div>
         <section>   
             <form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
@@ -41,7 +41,7 @@
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <div class="col-md-offset-2 col-md-10">
                         <button type="submit" class="btn btn-primary">Đăng ký</button>
                     </div>
