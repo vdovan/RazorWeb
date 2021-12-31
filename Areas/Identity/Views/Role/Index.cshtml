@@ -3,11 +3,13 @@
 
     ViewData["Title"] = "Quản lí các role (vai trò)";
 }
-<h2 class="mt-4">@ViewData["Title"]</h2>
+<div class="page-title ">
+    <h2>@ViewData["Title"]</h2>
+</div>
 
-<partial name="_StatusMessage"></partial>
 
 <h2 id="StatusMessage" class="text-center text-danger text-success"></h2>
+<div class="text-default" id ="errorModel"></div>
 @Html.AntiForgeryToken()
 <div class="container-fluid">
     <div class="row ">
@@ -16,9 +18,8 @@
                 <div class="col-md-6 form-center">
                     <form>
                         <div>
-                            <input type="text" class="form-control" placeholder="Role Name"
-                                style="display: inline-block;width: auto;">
-                            <a class="btn btn-primary" id="searchbtn" style="display: inline-block;">Search</a>
+                            <input id ="txtRoleSearch" type="text" class="form-control" placeholder="Role Name"/>
+                            <a class="btn btn-primary pull-right mt-3" id="searchbtn">Search</a>
                         </div>
                     </form>
                 </div>
@@ -30,12 +31,12 @@
 
                         <tr>
                             <th>Tên Role (vai trò)</th>
-                            <th>Tác vụ</th>
+                            @* <th>Tác vụ</th> *@
                         </tr>
                     </thead>
                     <tbody id="tableRole">
 
-                        @foreach (var role in Model)
+                        @* @foreach (var role in Model)
 
                         {
                             <tr>
@@ -53,7 +54,7 @@
                                 </td>
                             </tr>
 
-                        }
+                        } *@
                     </tbody>
                 </table>
             </div>
@@ -75,18 +76,19 @@
             </ul>
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <partial name="_StatusMessage"></partial>
-
                     <div class="row">
                         <div class="col-md-6 form-center">
-                            <form method="post" action="Create">
+                            <form method="post">
                                 <div class="form-group">
                                     <label class="control-label">Role Name</label>
                                     <input name="Name" id="txtroleName" class="form-control" />
                                 </div>
 
                                 <div class="form-group mt-4">
-                                    <input value="Lưu" class="btn btn-primary" onclick="SaveData()" />
+                                    <a id = "btnNew" class="btn btn-success" >Tạo mới</a>
+                                    <a id = "btnSave" class="btn btn-primary" >Lưu</a>
+                                    <a id = "btnDel" class="btn btn-danger" >Xóa</a>
+
                                 </div>
                             </form>
                         </div>
@@ -98,6 +100,11 @@
         </div>
     </div>
 </div>
-<script src="~/js/app/role.js">
-
+<script src="~/js/app/role.js"></script>
+<script>
+    $(document).ready(function(){
+        roleMgr.init();
+        //roleMgr.addEvent();
+    })
+    
 </script>
